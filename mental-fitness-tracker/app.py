@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import plotly.express as px
-import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
@@ -150,6 +148,13 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(139, 0, 0, 0.5);
         border-color: #ff1a1a;
         color: #ff6666;
+    }
+    .stDataFrame {
+        background: #0a0a0a;
+        border: 1px solid #1a0000;
+    }
+    .stDataFrame thead {
+        color: #ff1a1a;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -447,7 +452,6 @@ if st.session_state.df is not None:
                     
                     st.markdown("#### 📈 DALYs Trend Over Time")
                     
-                    # Using matplotlib instead of plotly to avoid fetch errors
                     fig, ax = plt.subplots(figsize=(12, 5))
                     fig.patch.set_facecolor('#0a0a0a')
                     ax.set_facecolor('#0a0a0a')
@@ -554,13 +558,16 @@ if st.session_state.df is not None:
                     fig.patch.set_facecolor('#0a0a0a')
                     ax.set_facecolor('#0a0a0a')
                     
-                    data_to_plot = [compare_df[compare_df['Entity'] == entity]['DALYs'] for entity in entities_multi]
-                    bp = ax.boxplot(data_to_plot, labels=entities_multi, patch_artist=True)
+                    data_to_plot = [compare_df[compare_df['Entity'] == entity]['DALYs'].values for entity in entities_multi]
+                    bp = ax.boxplot(data_to_plot, patch_artist=True)
                     
+                    # Set colors for boxes
                     for patch, color in zip(bp['boxes'], colors[:len(entities_multi)]):
                         patch.set_facecolor(color)
                         patch.set_alpha(0.7)
                     
+                    # Set labels
+                    ax.set_xticklabels(entities_multi, color='#666666')
                     ax.set_xlabel('Entity', color='#666666')
                     ax.set_ylabel('DALYs', color='#666666')
                     ax.set_title('DALYs Distribution by Entity', color='#ff1a1a')
@@ -606,20 +613,20 @@ if st.session_state.df is not None:
                         fig.patch.set_facecolor('#0a0a0a')
                         ax.set_facecolor('#0a0a0a')
                         
-                        data_to_plot = [box_df[box_df['Entity'] == entity]['DALYs'] for entity in top_entities]
+                        data_to_plot = [box_df[box_df['Entity'] == entity]['DALYs'].values for entity in top_entities]
                         colors = ['#ff1a1a', '#cc0000', '#990000', '#660000', '#330000'] * 2
-                        bp = ax.boxplot(data_to_plot, labels=top_entities, patch_artist=True)
+                        bp = ax.boxplot(data_to_plot, patch_artist=True)
                         
                         for patch, color in zip(bp['boxes'], colors[:len(top_entities)]):
                             patch.set_facecolor(color)
                             patch.set_alpha(0.7)
                         
+                        ax.set_xticklabels(top_entities, color='#666666', rotation=45, ha='right')
                         ax.set_xlabel('Entity', color='#666666')
                         ax.set_ylabel('DALYs', color='#666666')
                         ax.set_title('Top 10 Entities Distribution', color='#ff1a1a')
                         ax.tick_params(colors='#666666')
                         ax.grid(True, alpha=0.2, color='#1a0000')
-                        plt.xticks(rotation=45, ha='right')
                         
                         st.pyplot(fig)
                 
@@ -636,15 +643,17 @@ if st.session_state.df is not None:
                         fig.patch.set_facecolor('#0a0a0a')
                         ax.set_facecolor('#0a0a0a')
                         
-                        scatter = ax.scatter(cluster_df['Entity'], cluster_df['DALYs'], 
+                        scatter = ax.scatter(range(len(cluster_df)), cluster_df['DALYs'], 
                                            c=cluster_df['Cluster'], cmap='Reds', 
-                                           s=cluster_df['DALYs']*50, alpha=0.7,
+                                           s=cluster_df['DALYs']*30, alpha=0.7,
                                            edgecolors='#ff1a1a', linewidth=1)
+                        ax.set_xticks(range(len(cluster_df)))
+                        ax.set_xticklabels(cluster_df['Entity'], color='#666666', rotation=45, ha='right')
                         ax.set_xlabel('Entity', color='#666666')
                         ax.set_ylabel('DALYs', color='#666666')
                         ax.set_title('Entity Clustering by DALYs', color='#ff1a1a')
                         ax.tick_params(colors='#666666')
-                        plt.xticks(rotation=45, ha='right')
+                        ax.grid(True, alpha=0.2, color='#1a0000')
                         
                         st.pyplot(fig)
             else:
@@ -777,17 +786,16 @@ if st.session_state.df is not None:
                         global_df = df_clean
                     
                     if not global_df.empty:
-                        # Use matplotlib for world map (simpler, no external dependencies)
-                        st.markdown("#### 🌍 World Map View")
+                        # Top countries chart
+                        st.markdown("#### 🌍 Global Mental Health Burden")
                         
-                        # Create a pivot table for the map
+                        # Show top 20 countries
                         top_countries = global_df.nlargest(20, 'DALYs')[['Entity', 'DALYs']]
                         
                         fig, ax = plt.subplots(figsize=(12, 8))
                         fig.patch.set_facecolor('#0a0a0a')
                         ax.set_facecolor('#0a0a0a')
                         
-                        # Create bar chart instead of map (more reliable)
                         colors_red = plt.cm.Reds(np.linspace(0.3, 0.9, len(top_countries)))
                         bars = ax.barh(top_countries['Entity'], top_countries['DALYs'], color=colors_red)
                         ax.set_xlabel('DALYs', color='#666666')
