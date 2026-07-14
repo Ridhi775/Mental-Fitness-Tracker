@@ -201,8 +201,8 @@ with st.sidebar:
     if st.button("📥 Load Sample Dataset", use_container_width=True):
         try:
             sample_paths = [
-                "mental-and-substance-use-as-share-of-disease.csv",
                 "data/mental-and-substance-use-as-share-of-disease.csv",
+                "mental-and-substance-use-as-share-of-disease.csv",
                 "../data/mental-and-substance-use-as-share-of-disease.csv"
             ]
             
@@ -394,7 +394,7 @@ if st.session_state.df is not None:
             "📋 Data Explorer"
         ])
         
-        # ============ TAB 1: OVERVIEW (UNCHANGED) ============
+        # ============ TAB 1: OVERVIEW ============
         with tab1:
             st.markdown("### 📊 Overview Dashboard")
             
@@ -460,8 +460,8 @@ if st.session_state.df is not None:
                     ))
                     fig.update_layout(
                         title=dict(text=f'Mental Health Burden - {selected_entity}', font=dict(color='#ff1a1a')),
-                        xaxis=dict(title='Year', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        yaxis=dict(title='DALYs', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                        xaxis=dict(title='Year', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                        yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
                         plot_bgcolor='#0a0a0a',
                         paper_bgcolor='#0a0a0a',
                         height=400,
@@ -482,8 +482,8 @@ if st.session_state.df is not None:
                         ))
                         fig_hist.update_layout(
                             title=dict(text='DALYs Distribution', font=dict(color='#ff1a1a')),
-                            xaxis=dict(title='DALYs', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                            yaxis=dict(title='Frequency', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                            xaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                            yaxis=dict(title='Frequency', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
                             plot_bgcolor='#0a0a0a',
                             paper_bgcolor='#0a0a0a',
                             height=350,
@@ -504,8 +504,8 @@ if st.session_state.df is not None:
                             ))
                             fig_change.update_layout(
                                 title=dict(text='Year-over-Year Change (%)', font=dict(color='#ff1a1a')),
-                                xaxis=dict(title='Year', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                                yaxis=dict(title='Change (%)', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                                xaxis=dict(title='Year', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                                yaxis=dict(title='Change (%)', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
                                 plot_bgcolor='#0a0a0a',
                                 paper_bgcolor='#0a0a0a',
                                 height=350,
@@ -517,7 +517,7 @@ if st.session_state.df is not None:
             else:
                 st.warning("⚠️ Missing required columns. Please ensure your data has Entity, Year, and DALYs columns.")
         
-        # ============ TAB 2: TRENDS (UNCHANGED) ============
+        # ============ TAB 2: TRENDS ============
         with tab2:
             st.markdown("### 📈 Trend Analysis")
             
@@ -547,8 +547,8 @@ if st.session_state.df is not None:
                     
                     fig.update_layout(
                         title=dict(text='Mental Health Burden Comparison', font=dict(color='#ff1a1a')),
-                        xaxis=dict(title='Year', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        yaxis=dict(title='DALYs', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                        xaxis=dict(title='Year', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                        yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
                         plot_bgcolor='#0a0a0a',
                         paper_bgcolor='#0a0a0a',
                         height=450,
@@ -575,8 +575,8 @@ if st.session_state.df is not None:
                     
                     fig_box.update_layout(
                         title=dict(text='DALYs Distribution by Entity', font=dict(color='#ff1a1a')),
-                        xaxis=dict(title='Entity', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        yaxis=dict(title='DALYs', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                        xaxis=dict(title='Entity', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                        yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
                         plot_bgcolor='#0a0a0a',
                         paper_bgcolor='#0a0a0a',
                         height=400,
@@ -588,7 +588,7 @@ if st.session_state.df is not None:
             else:
                 st.warning("⚠️ Missing required columns. Please ensure your data has Entity, Year, and DALYs columns.")
         
-        # ============ TAB 3: ANALYSIS (UNCHANGED) ============
+        # ============ TAB 3: ANALYSIS ============
         with tab3:
             st.markdown("### 📉 Advanced Analysis")
             
@@ -630,8 +630,8 @@ if st.session_state.df is not None:
                         
                         fig.update_layout(
                             title=dict(text='Top 10 Entities Distribution', font=dict(color='#ff1a1a')),
-                            xaxis=dict(title='Entity', titlefont=dict(color='#666666'), tickfont=dict(color='#666666')),
-                            yaxis=dict(title='DALYs', titlefont=dict(color='#666666'), tickfont=dict(color='#666666')),
+                            xaxis=dict(title='Entity', title_font=dict(color='#666666'), tickfont=dict(color='#666666')),
+                            yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666')),
                             plot_bgcolor='#0a0a0a',
                             paper_bgcolor='#0a0a0a',
                             height=500,
@@ -670,32 +670,26 @@ if st.session_state.df is not None:
             else:
                 st.warning("⚠️ Missing 'DALYs' column for analysis.")
         
-        # ============ TAB 4: AI STUDIO (FIXED) ============
+        # ============ TAB 4: AI STUDIO ============
         with tab4:
             st.markdown("### 🤖 AI Studio - Machine Learning")
             
             if has_dalys and len(df_clean) > 10:
                 try:
-                    # Prepare data - Only use numeric columns for ML
                     ml_df = df_clean.copy()
-                    
-                    # Drop non-numeric columns except Entity for encoding
                     numeric_cols = ml_df.select_dtypes(include=[np.number]).columns
                     
                     if len(numeric_cols) > 1:
-                        # Encode only categorical columns if needed
                         le = LabelEncoder()
                         if 'Entity' in ml_df.columns:
                             ml_df['Entity_encoded'] = le.fit_transform(ml_df['Entity'].astype(str))
                         
-                        # Select only numeric columns for features
                         feature_cols = []
                         if 'Entity_encoded' in ml_df.columns:
                             feature_cols.append('Entity_encoded')
                         if 'Year' in ml_df.columns:
                             feature_cols.append('Year')
                         
-                        # Add other numeric columns
                         for col in numeric_cols:
                             if col not in ['DALYs'] and col not in feature_cols:
                                 feature_cols.append(col)
@@ -704,7 +698,6 @@ if st.session_state.df is not None:
                             X = ml_df[feature_cols]
                             y = ml_df['DALYs']
                             
-                            # Remove any rows with NaN
                             X = X.fillna(0)
                             y = y.fillna(0)
                             
@@ -749,8 +742,8 @@ if st.session_state.df is not None:
                                 ))
                                 fig.update_layout(
                                     title=dict(text='Actual vs Predicted', font=dict(color='#ff1a1a')),
-                                    xaxis=dict(title='Actual', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                                    yaxis=dict(title='Predicted', titlefont=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                                    xaxis=dict(title='Actual', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
+                                    yaxis=dict(title='Predicted', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
                                     plot_bgcolor='#0a0a0a',
                                     paper_bgcolor='#0a0a0a',
                                     height=400,
@@ -788,7 +781,7 @@ if st.session_state.df is not None:
             else:
                 st.warning("Need at least 10 rows of data with 'DALYs' column")
         
-        # ============ TAB 5: GLOBAL (FIXED) ============
+        # ============ TAB 5: GLOBAL ============
         with tab5:
             st.markdown("### 🌍 Global View")
             
@@ -890,7 +883,7 @@ if st.session_state.df is not None:
             else:
                 st.warning("⚠️ Global view requires 'Entity' and 'DALYs' columns.")
         
-        # ============ TAB 6: CORRELATION (FIXED) ============
+        # ============ TAB 6: CORRELATION ============
         with tab6:
             st.markdown("### 📊 Correlation Analysis")
             
@@ -967,7 +960,7 @@ if st.session_state.df is not None:
                 if len(numeric_cols) > 0:
                     st.write("Numeric columns found:", ", ".join(numeric_cols))
         
-        # ============ TAB 7: DATA EXPLORER (FIXED) ============
+        # ============ TAB 7: DATA EXPLORER ============
         with tab7:
             st.markdown("### 📋 Data Explorer")
             
