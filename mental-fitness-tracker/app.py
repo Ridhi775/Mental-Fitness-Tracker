@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
@@ -447,71 +446,64 @@ if st.session_state.df is not None:
                         st.metric("Data Points", len(filtered_df))
                     
                     st.markdown("#### 📈 DALYs Trend Over Time")
-                    fig = go.Figure()
-                    fig.add_trace(go.Scatter(
-                        x=filtered_df['Year'],
-                        y=filtered_df['DALYs'],
-                        mode='lines+markers',
-                        name='DALYs',
-                        line=dict(color='#ff1a1a', width=3),
-                        marker=dict(size=10, color='#8B0000', line=dict(color='#ff1a1a', width=2)),
-                        fill='tozeroy',
-                        fillcolor='rgba(139, 0, 0, 0.2)'
-                    ))
-                    fig.update_layout(
-                        title=dict(text=f'Mental Health Burden - {selected_entity}', font=dict(color='#ff1a1a')),
-                        xaxis=dict(title='Year', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        plot_bgcolor='#0a0a0a',
-                        paper_bgcolor='#0a0a0a',
-                        height=400,
-                        hovermode='x unified',
-                        showlegend=False
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Using matplotlib instead of plotly to avoid fetch errors
+                    fig, ax = plt.subplots(figsize=(12, 5))
+                    fig.patch.set_facecolor('#0a0a0a')
+                    ax.set_facecolor('#0a0a0a')
+                    
+                    ax.plot(filtered_df['Year'], filtered_df['DALYs'], 
+                           color='#ff1a1a', linewidth=2, marker='o', 
+                           markersize=8, markerfacecolor='#8B0000',
+                           markeredgecolor='#ff1a1a', markeredgewidth=2)
+                    ax.fill_between(filtered_df['Year'], filtered_df['DALYs'], 
+                                   alpha=0.3, color='#8B0000')
+                    ax.set_xlabel('Year', color='#666666')
+                    ax.set_ylabel('DALYs', color='#666666')
+                    ax.set_title(f'Mental Health Burden - {selected_entity}', color='#ff1a1a')
+                    ax.tick_params(colors='#666666')
+                    ax.grid(True, alpha=0.2, color='#1a0000')
+                    
+                    st.pyplot(fig)
                     
                     col1, col2 = st.columns(2)
                     
                     with col1:
                         st.markdown("#### 📊 Distribution")
-                        fig_hist = go.Figure()
-                        fig_hist.add_trace(go.Histogram(
-                            x=filtered_df['DALYs'],
-                            nbinsx=30,
-                            marker=dict(color='#8B0000', line=dict(color='#ff1a1a', width=1))
-                        ))
-                        fig_hist.update_layout(
-                            title=dict(text='DALYs Distribution', font=dict(color='#ff1a1a')),
-                            xaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                            yaxis=dict(title='Frequency', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                            plot_bgcolor='#0a0a0a',
-                            paper_bgcolor='#0a0a0a',
-                            height=350,
-                            showlegend=False
-                        )
-                        st.plotly_chart(fig_hist, use_container_width=True)
+                        fig, ax = plt.subplots(figsize=(10, 4))
+                        fig.patch.set_facecolor('#0a0a0a')
+                        ax.set_facecolor('#0a0a0a')
+                        
+                        ax.hist(filtered_df['DALYs'], bins=30, color='#8B0000', 
+                               edgecolor='#ff1a1a', alpha=0.7)
+                        ax.set_xlabel('DALYs', color='#666666')
+                        ax.set_ylabel('Frequency', color='#666666')
+                        ax.set_title('DALYs Distribution', color='#ff1a1a')
+                        ax.tick_params(colors='#666666')
+                        ax.grid(True, alpha=0.2, color='#1a0000')
+                        
+                        st.pyplot(fig)
                     
                     with col2:
                         st.markdown("#### 📈 Year-over-Year Change")
                         if len(filtered_df) > 1:
                             filtered_df['Change'] = filtered_df['DALYs'].pct_change() * 100
+                            
+                            fig, ax = plt.subplots(figsize=(10, 4))
+                            fig.patch.set_facecolor('#0a0a0a')
+                            ax.set_facecolor('#0a0a0a')
+                            
                             colors = ['#8B0000' if x < 0 else '#ff1a1a' for x in filtered_df['Change'].fillna(0)]
-                            fig_change = go.Figure()
-                            fig_change.add_trace(go.Bar(
-                                x=filtered_df['Year'],
-                                y=filtered_df['Change'].fillna(0),
-                                marker=dict(color=colors, line=dict(color='#ff1a1a', width=1))
-                            ))
-                            fig_change.update_layout(
-                                title=dict(text='Year-over-Year Change (%)', font=dict(color='#ff1a1a')),
-                                xaxis=dict(title='Year', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                                yaxis=dict(title='Change (%)', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                                plot_bgcolor='#0a0a0a',
-                                paper_bgcolor='#0a0a0a',
-                                height=350,
-                                showlegend=False
-                            )
-                            st.plotly_chart(fig_change, use_container_width=True)
+                            ax.bar(filtered_df['Year'], filtered_df['Change'].fillna(0), 
+                                  color=colors, edgecolor='#ff1a1a', linewidth=1)
+                            ax.axhline(y=0, color='#666666', linestyle='--', linewidth=1)
+                            ax.set_xlabel('Year', color='#666666')
+                            ax.set_ylabel('Change (%)', color='#666666')
+                            ax.set_title('Year-over-Year Change (%)', color='#ff1a1a')
+                            ax.tick_params(colors='#666666')
+                            ax.grid(True, alpha=0.2, color='#1a0000')
+                            
+                            st.pyplot(fig)
                 else:
                     st.warning("No data available for the selected filters")
             else:
@@ -532,30 +524,25 @@ if st.session_state.df is not None:
                 if entities_multi:
                     compare_df = df_clean[df_clean['Entity'].isin(entities_multi)]
                     
-                    fig = go.Figure()
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    fig.patch.set_facecolor('#0a0a0a')
+                    ax.set_facecolor('#0a0a0a')
+                    
                     colors = ['#ff1a1a', '#cc0000', '#990000', '#660000', '#330000']
                     for i, entity in enumerate(entities_multi):
                         entity_data = compare_df[compare_df['Entity'] == entity].sort_values('Year')
-                        fig.add_trace(go.Scatter(
-                            x=entity_data['Year'],
-                            y=entity_data['DALYs'],
-                            mode='lines+markers',
-                            name=entity,
-                            line=dict(color=colors[i % len(colors)], width=2),
-                            marker=dict(size=8, color=colors[i % len(colors)])
-                        ))
+                        ax.plot(entity_data['Year'], entity_data['DALYs'], 
+                               color=colors[i % len(colors)], linewidth=2, 
+                               marker='o', label=entity, markersize=6)
                     
-                    fig.update_layout(
-                        title=dict(text='Mental Health Burden Comparison', font=dict(color='#ff1a1a')),
-                        xaxis=dict(title='Year', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        plot_bgcolor='#0a0a0a',
-                        paper_bgcolor='#0a0a0a',
-                        height=450,
-                        hovermode='x unified',
-                        legend=dict(font=dict(color='#666666'), bgcolor='#0a0a0a', bordercolor='#1a0000')
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
+                    ax.set_xlabel('Year', color='#666666')
+                    ax.set_ylabel('DALYs', color='#666666')
+                    ax.set_title('Mental Health Burden Comparison', color='#ff1a1a')
+                    ax.tick_params(colors='#666666')
+                    ax.grid(True, alpha=0.2, color='#1a0000')
+                    ax.legend(loc='best', facecolor='#0a0a0a', edgecolor='#1a0000', labelcolor='#666666')
+                    
+                    st.pyplot(fig)
                     
                     st.markdown("#### 📊 Summary Statistics")
                     summary = compare_df.groupby('Entity')['DALYs'].agg(['mean', 'min', 'max', 'std']).round(2)
@@ -563,26 +550,24 @@ if st.session_state.df is not None:
                     st.dataframe(summary, use_container_width=True)
                     
                     st.markdown("#### 📊 Distribution Comparison")
-                    fig_box = go.Figure()
-                    for i, entity in enumerate(entities_multi):
-                        entity_data = compare_df[compare_df['Entity'] == entity]['DALYs']
-                        fig_box.add_trace(go.Box(
-                            y=entity_data,
-                            name=entity,
-                            marker_color=colors[i % len(colors)],
-                            boxmean='sd'
-                        ))
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    fig.patch.set_facecolor('#0a0a0a')
+                    ax.set_facecolor('#0a0a0a')
                     
-                    fig_box.update_layout(
-                        title=dict(text='DALYs Distribution by Entity', font=dict(color='#ff1a1a')),
-                        xaxis=dict(title='Entity', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                        plot_bgcolor='#0a0a0a',
-                        paper_bgcolor='#0a0a0a',
-                        height=400,
-                        showlegend=False
-                    )
-                    st.plotly_chart(fig_box, use_container_width=True)
+                    data_to_plot = [compare_df[compare_df['Entity'] == entity]['DALYs'] for entity in entities_multi]
+                    bp = ax.boxplot(data_to_plot, labels=entities_multi, patch_artist=True)
+                    
+                    for patch, color in zip(bp['boxes'], colors[:len(entities_multi)]):
+                        patch.set_facecolor(color)
+                        patch.set_alpha(0.7)
+                    
+                    ax.set_xlabel('Entity', color='#666666')
+                    ax.set_ylabel('DALYs', color='#666666')
+                    ax.set_title('DALYs Distribution by Entity', color='#ff1a1a')
+                    ax.tick_params(colors='#666666')
+                    ax.grid(True, alpha=0.2, color='#1a0000')
+                    
+                    st.pyplot(fig)
                 else:
                     st.info("Select at least one entity to compare")
             else:
@@ -617,27 +602,26 @@ if st.session_state.df is not None:
                         top_entities = df_clean.groupby('Entity')['DALYs'].mean().nlargest(10).index
                         box_df = df_clean[df_clean['Entity'].isin(top_entities)]
                         
-                        fig = go.Figure()
-                        colors = ['#ff1a1a', '#cc0000', '#990000', '#660000', '#330000']
-                        for i, entity in enumerate(top_entities):
-                            entity_data = box_df[box_df['Entity'] == entity]['DALYs']
-                            fig.add_trace(go.Box(
-                                y=entity_data,
-                                name=entity,
-                                marker_color=colors[i % len(colors)],
-                                boxmean='sd'
-                            ))
+                        fig, ax = plt.subplots(figsize=(12, 6))
+                        fig.patch.set_facecolor('#0a0a0a')
+                        ax.set_facecolor('#0a0a0a')
                         
-                        fig.update_layout(
-                            title=dict(text='Top 10 Entities Distribution', font=dict(color='#ff1a1a')),
-                            xaxis=dict(title='Entity', title_font=dict(color='#666666'), tickfont=dict(color='#666666')),
-                            yaxis=dict(title='DALYs', title_font=dict(color='#666666'), tickfont=dict(color='#666666')),
-                            plot_bgcolor='#0a0a0a',
-                            paper_bgcolor='#0a0a0a',
-                            height=500,
-                            showlegend=False
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
+                        data_to_plot = [box_df[box_df['Entity'] == entity]['DALYs'] for entity in top_entities]
+                        colors = ['#ff1a1a', '#cc0000', '#990000', '#660000', '#330000'] * 2
+                        bp = ax.boxplot(data_to_plot, labels=top_entities, patch_artist=True)
+                        
+                        for patch, color in zip(bp['boxes'], colors[:len(top_entities)]):
+                            patch.set_facecolor(color)
+                            patch.set_alpha(0.7)
+                        
+                        ax.set_xlabel('Entity', color='#666666')
+                        ax.set_ylabel('DALYs', color='#666666')
+                        ax.set_title('Top 10 Entities Distribution', color='#ff1a1a')
+                        ax.tick_params(colors='#666666')
+                        ax.grid(True, alpha=0.2, color='#1a0000')
+                        plt.xticks(rotation=45, ha='right')
+                        
+                        st.pyplot(fig)
                 
                 if has_entity:
                     st.markdown("#### 🎯 Cluster Analysis")
@@ -648,25 +632,21 @@ if st.session_state.df is not None:
                         clusters = kmeans.fit_predict(cluster_df[['DALYs']])
                         cluster_df['Cluster'] = clusters
                         
-                        fig = px.scatter(
-                            cluster_df,
-                            x='Entity',
-                            y='DALYs',
-                            color=cluster_df['Cluster'].astype(str),
-                            title='Entity Clustering by DALYs',
-                            size='DALYs',
-                            size_max=30,
-                            color_discrete_sequence=['#ff1a1a', '#cc0000', '#990000', '#660000']
-                        )
-                        fig.update_layout(
-                            plot_bgcolor='#0a0a0a',
-                            paper_bgcolor='#0a0a0a',
-                            font=dict(color='#666666'),
-                            xaxis=dict(gridcolor='#1a0000'),
-                            yaxis=dict(gridcolor='#1a0000'),
-                            legend=dict(font=dict(color='#666666'), bgcolor='#0a0a0a', bordercolor='#1a0000')
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
+                        fig, ax = plt.subplots(figsize=(12, 6))
+                        fig.patch.set_facecolor('#0a0a0a')
+                        ax.set_facecolor('#0a0a0a')
+                        
+                        scatter = ax.scatter(cluster_df['Entity'], cluster_df['DALYs'], 
+                                           c=cluster_df['Cluster'], cmap='Reds', 
+                                           s=cluster_df['DALYs']*50, alpha=0.7,
+                                           edgecolors='#ff1a1a', linewidth=1)
+                        ax.set_xlabel('Entity', color='#666666')
+                        ax.set_ylabel('DALYs', color='#666666')
+                        ax.set_title('Entity Clustering by DALYs', color='#ff1a1a')
+                        ax.tick_params(colors='#666666')
+                        plt.xticks(rotation=45, ha='right')
+                        
+                        st.pyplot(fig)
             else:
                 st.warning("⚠️ Missing 'DALYs' column for analysis.")
         
@@ -726,30 +706,24 @@ if st.session_state.df is not None:
                                     st.metric("MSE", f"{mse:.4f}")
                                 
                                 st.markdown("#### 📊 Actual vs Predicted")
-                                fig = go.Figure()
-                                fig.add_trace(go.Scatter(
-                                    x=y_test, y=y_pred,
-                                    mode='markers',
-                                    name='Predictions',
-                                    marker=dict(color='#8B0000', size=10, line=dict(color='#ff1a1a', width=1))
-                                ))
-                                fig.add_trace(go.Scatter(
-                                    x=[y_test.min(), y_test.max()],
-                                    y=[y_test.min(), y_test.max()],
-                                    mode='lines',
-                                    name='Perfect Prediction',
-                                    line=dict(color='#ff1a1a', dash='dash')
-                                ))
-                                fig.update_layout(
-                                    title=dict(text='Actual vs Predicted', font=dict(color='#ff1a1a')),
-                                    xaxis=dict(title='Actual', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                                    yaxis=dict(title='Predicted', title_font=dict(color='#666666'), tickfont=dict(color='#666666'), gridcolor='#1a0000'),
-                                    plot_bgcolor='#0a0a0a',
-                                    paper_bgcolor='#0a0a0a',
-                                    height=400,
-                                    legend=dict(font=dict(color='#666666'), bgcolor='#0a0a0a', bordercolor='#1a0000')
-                                )
-                                st.plotly_chart(fig, use_container_width=True)
+                                
+                                fig, ax = plt.subplots(figsize=(10, 6))
+                                fig.patch.set_facecolor('#0a0a0a')
+                                ax.set_facecolor('#0a0a0a')
+                                
+                                ax.scatter(y_test, y_pred, alpha=0.6, color='#8B0000', 
+                                         edgecolors='#ff1a1a', linewidth=1)
+                                ax.plot([y_test.min(), y_test.max()], 
+                                       [y_test.min(), y_test.max()], 
+                                       'r--', linewidth=2, label='Perfect Prediction')
+                                ax.set_xlabel('Actual', color='#666666')
+                                ax.set_ylabel('Predicted', color='#666666')
+                                ax.set_title('Actual vs Predicted', color='#ff1a1a')
+                                ax.tick_params(colors='#666666')
+                                ax.grid(True, alpha=0.2, color='#1a0000')
+                                ax.legend(loc='best', facecolor='#0a0a0a', edgecolor='#1a0000', labelcolor='#666666')
+                                
+                                st.pyplot(fig)
                                 
                                 if hasattr(model, 'feature_importances_'):
                                     st.markdown("#### 🔑 Feature Importance")
@@ -761,13 +735,18 @@ if st.session_state.df is not None:
                                     fig, ax = plt.subplots(figsize=(10, 6))
                                     fig.patch.set_facecolor('#0a0a0a')
                                     ax.set_facecolor('#0a0a0a')
+                                    
                                     bars = ax.barh(importance_df['Feature'], importance_df['Importance'])
                                     for bar in bars:
                                         bar.set_color('#8B0000')
                                         bar.set_edgecolor('#ff1a1a')
+                                        bar.set_linewidth(1)
+                                    
                                     ax.set_xlabel('Importance', color='#666666')
                                     ax.set_title('Feature Importance', color='#ff1a1a')
                                     ax.tick_params(colors='#666666')
+                                    ax.grid(True, alpha=0.2, color='#1a0000')
+                                    
                                     st.pyplot(fig)
                                 
                                 st.success("✅ Model trained successfully!")
@@ -798,83 +777,74 @@ if st.session_state.df is not None:
                         global_df = df_clean
                     
                     if not global_df.empty:
-                        fig = px.choropleth(
-                            global_df,
-                            locations='Entity',
-                            locationmode='country names',
-                            color='DALYs',
-                            hover_name='Entity',
-                            hover_data={'DALYs': True},
-                            title=f'Global Mental Health Burden' + (f' ({selected_year})' if has_year else ''),
-                            color_continuous_scale='Reds',
-                            labels={'DALYs': 'DALYs'}
-                        )
-                        fig.update_layout(
-                            height=500,
-                            geo=dict(
-                                showframe=False,
-                                showcoastlines=True,
-                                projection_type='equirectangular',
-                                bgcolor='#0a0a0a',
-                                landcolor='#1a0000',
-                                oceancolor='#0a0a0a',
-                                coastlinecolor='#8B0000'
-                            ),
-                            plot_bgcolor='#0a0a0a',
-                            paper_bgcolor='#0a0a0a',
-                            font=dict(color='#666666')
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
+                        # Use matplotlib for world map (simpler, no external dependencies)
+                        st.markdown("#### 🌍 World Map View")
+                        
+                        # Create a pivot table for the map
+                        top_countries = global_df.nlargest(20, 'DALYs')[['Entity', 'DALYs']]
+                        
+                        fig, ax = plt.subplots(figsize=(12, 8))
+                        fig.patch.set_facecolor('#0a0a0a')
+                        ax.set_facecolor('#0a0a0a')
+                        
+                        # Create bar chart instead of map (more reliable)
+                        colors_red = plt.cm.Reds(np.linspace(0.3, 0.9, len(top_countries)))
+                        bars = ax.barh(top_countries['Entity'], top_countries['DALYs'], color=colors_red)
+                        ax.set_xlabel('DALYs', color='#666666')
+                        ax.set_title(f'Global Mental Health Burden' + (f' ({selected_year})' if has_year else ''), color='#ff1a1a')
+                        ax.tick_params(colors='#666666')
+                        ax.grid(True, alpha=0.2, color='#1a0000')
+                        
+                        st.pyplot(fig)
                         
                         col1, col2 = st.columns(2)
                         
                         with col1:
                             st.markdown("#### 🏆 Top 10 Countries")
                             top_countries = global_df.nlargest(10, 'DALYs')[['Entity', 'DALYs']]
-                            if not top_countries.empty:
-                                fig = px.bar(
-                                    top_countries,
-                                    x='DALYs',
-                                    y='Entity',
-                                    orientation='h',
-                                    text='DALYs',
-                                    color='DALYs',
-                                    color_continuous_scale='Reds'
-                                )
-                                fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-                                fig.update_layout(
-                                    height=400,
-                                    plot_bgcolor='#0a0a0a',
-                                    paper_bgcolor='#0a0a0a',
-                                    font=dict(color='#666666'),
-                                    xaxis=dict(gridcolor='#1a0000'),
-                                    yaxis=dict(gridcolor='#1a0000')
-                                )
-                                st.plotly_chart(fig, use_container_width=True)
+                            
+                            fig, ax = plt.subplots(figsize=(10, 6))
+                            fig.patch.set_facecolor('#0a0a0a')
+                            ax.set_facecolor('#0a0a0a')
+                            
+                            colors_red = plt.cm.Reds(np.linspace(0.4, 0.9, len(top_countries)))
+                            bars = ax.barh(top_countries['Entity'], top_countries['DALYs'], color=colors_red)
+                            ax.set_xlabel('DALYs', color='#666666')
+                            ax.set_title('Highest Mental Health Burden', color='#ff1a1a')
+                            ax.tick_params(colors='#666666')
+                            ax.grid(True, alpha=0.2, color='#1a0000')
+                            
+                            st.pyplot(fig)
                         
                         with col2:
                             st.markdown("#### 📉 Bottom 10 Countries")
                             bottom_countries = global_df.nsmallest(10, 'DALYs')[['Entity', 'DALYs']]
-                            if not bottom_countries.empty:
-                                fig = px.bar(
-                                    bottom_countries,
-                                    x='DALYs',
-                                    y='Entity',
-                                    orientation='h',
-                                    text='DALYs',
-                                    color='DALYs',
-                                    color_continuous_scale='Greens'
-                                )
-                                fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-                                fig.update_layout(
-                                    height=400,
-                                    plot_bgcolor='#0a0a0a',
-                                    paper_bgcolor='#0a0a0a',
-                                    font=dict(color='#666666'),
-                                    xaxis=dict(gridcolor='#1a0000'),
-                                    yaxis=dict(gridcolor='#1a0000')
-                                )
-                                st.plotly_chart(fig, use_container_width=True)
+                            
+                            fig, ax = plt.subplots(figsize=(10, 6))
+                            fig.patch.set_facecolor('#0a0a0a')
+                            ax.set_facecolor('#0a0a0a')
+                            
+                            colors_green = plt.cm.Greens(np.linspace(0.3, 0.8, len(bottom_countries)))
+                            bars = ax.barh(bottom_countries['Entity'], bottom_countries['DALYs'], color=colors_green)
+                            ax.set_xlabel('DALYs', color='#666666')
+                            ax.set_title('Lowest Mental Health Burden', color='#ff1a1a')
+                            ax.tick_params(colors='#666666')
+                            ax.grid(True, alpha=0.2, color='#1a0000')
+                            
+                            st.pyplot(fig)
+                        
+                        # Global Statistics
+                        st.markdown("#### 📊 Global Statistics")
+                        col1, col2, col3, col4 = st.columns(4)
+                        
+                        with col1:
+                            st.metric("Global Mean", f"{global_df['DALYs'].mean():.2f}")
+                        with col2:
+                            st.metric("Global Median", f"{global_df['DALYs'].median():.2f}")
+                        with col3:
+                            st.metric("Global Max", f"{global_df['DALYs'].max():.2f}")
+                        with col4:
+                            st.metric("Global Min", f"{global_df['DALYs'].min():.2f}")
                     else:
                         st.warning("No data available for the selected year")
                 except Exception as e:
@@ -907,10 +877,6 @@ if st.session_state.df is not None:
                     )
                     ax.set_title('Correlation Matrix', color='#ff1a1a', size=14)
                     ax.tick_params(colors='#666666')
-                    
-                    cbar = ax.collections[0].colorbar
-                    cbar.ax.yaxis.set_tick_params(color='#666666')
-                    plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='#666666')
                     
                     st.pyplot(fig)
                     
